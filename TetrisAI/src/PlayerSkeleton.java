@@ -1,4 +1,7 @@
-
+/*
+ * Possible feature extensions: 
+ *  
+ * */
 public class PlayerSkeleton {
 	private double holeWeight = -7.899265427351652;
 	private double heightWeight = -4.500158825082766;
@@ -60,7 +63,15 @@ public class PlayerSkeleton {
 		}
 		return totalHoles;
 	}
-	
+	int getMaximumHeight(){
+		int highest = 0;
+		for(int i = 0; i < top.length; i++){
+			if(top[i] > highest){
+				highest = top[i];
+			}
+		}
+		return highest;
+	}
 	int getTopWellDepth(int col, int topRow, int[][] result){
 		int total = 0;
 		for(int i = topRow; i >= 0; i--){
@@ -70,13 +81,16 @@ public class PlayerSkeleton {
 				total += 1;
 			}
 		}
+		System.out.println("col "+col + " depth "+ total);
 		return total;
 	}
+	
 	int cumulateWellDepth(int col, int[][] result){
 		int total = 0;
 		int currDepth = 0;
 		int level = 0;
-		for(int i = top[col] - 1; i >= 0; i--){
+		int highest = getMaximumHeight();
+		for(int i = highest - 1; i >= 0; i--){
 			level += 1;
 			if(result[i][col] > 0){
 				currDepth = 0;
@@ -111,6 +125,7 @@ public class PlayerSkeleton {
 		for(int col = 0; col < State.COLS; col ++){
 			total += cumulateWellDepth(col, result);
 		}
+		System.out.println("wells "+ total);
 		return total;
 	}
 	
@@ -157,8 +172,6 @@ public class PlayerSkeleton {
 		int turn = s.getTurnNumber() + 1;
 		//for each column beyond the first in the piece
 		for(int c = 1; c < pWidth[nextPiece][orient];c++) {
-//			System.out.println("slot " + top[slot+c] + " offset "+pBottom[nextPiece][orient][c]);
-//			System.out.println(c +" compare height "+ height + " "+(top[slot+c]-pBottom[nextPiece][orient][c]) + " bottom "+ pBottom[nextPiece][orient][c]);
 			height = Math.max(height,top[slot+c]-pBottom[nextPiece][orient][c]);
 		}
 		//check if game ended
@@ -172,7 +185,6 @@ public class PlayerSkeleton {
 				for(int i = 0; i < pWidth[nextPiece][orient]; i++) {
 					//from bottom to top of brick
 					for(int h = (height+pBottom[nextPiece][orient][i]); h < height+pTop[nextPiece][orient][i]; h++) {
-//						System.out.println(i + " height "+ h + " max "+ height + " "+ pBottom[nextPiece][orient][i]);
 						field[h][i+slot] = turn;
 					}
 				}
