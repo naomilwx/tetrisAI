@@ -1,6 +1,9 @@
 /*
  * Possible feature extensions: 
- *  
+ *  Difference between max and min height
+ *  Surface "smoothness" difference between neighbouring heights
+ *  Potential Rows: The number of rows located above the Highest Hole and in use by more than 8 
+cells. ??? taken from http://ijcsi.org/papers/IJCSI-8-1-22-31.pdf
  * */
 public class PlayerSkeleton {
 	private double holeWeight = -7.899265427351652;
