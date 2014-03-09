@@ -1,0 +1,8 @@
+Tetris AI ref:
+http://ielashi.com/el-tetris-an-improvement-on-pierre-dellacheries-algorithm/ (features mentioned here have already been implemented)
+http://ijcsi.org/papers/IJCSI-8-1-22-31.pdf
+http://static.squarespace.com/static/522e43c8e4b0f3d0e82fd40c/t/52360c2ee4b06413e74cea98/1379273774464/JL%20Tetris%20AI.pdf
+Training:
+particle swamp optimisation: http://jswarm-pso.sourceforge.net/
+http://luckytoilet.wordpress.com/2011/05/27/coding-a-tetris-ai-using-a-genetic-algorithm/
+
