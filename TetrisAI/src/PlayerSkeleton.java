@@ -84,7 +84,7 @@ public class PlayerSkeleton {
 				total += 1;
 			}
 		}
-		System.out.println("col "+col + " depth "+ total);
+//		System.out.println("col "+col + " depth "+ total);
 		return total;
 	}
 	
@@ -128,7 +128,7 @@ public class PlayerSkeleton {
 		for(int col = 0; col < State.COLS; col ++){
 			total += cumulateWellDepth(col, result);
 		}
-		System.out.println("wells "+ total);
+//		System.out.println("wells "+ total);
 		return total;
 	}
 	
@@ -139,8 +139,8 @@ public class PlayerSkeleton {
 				total += 1;
 			}
 			for(int col = 1; col < State.COLS - 1; col++){
-				if(result[row][col]> 0 && result[row][col + 1] == 0 
-						|| result[row][col] == 0 && result[row][col + 1] > 0){
+				if((result[row][col]> 0 && result[row][col + 1] == 0) 
+						|| (result[row][col] == 0 && result[row][col + 1] > 0)){
 					total += 1;
 				}
 			}
@@ -155,7 +155,8 @@ public class PlayerSkeleton {
 				total += 1;
 			}
 			for(int row = 1; row < State.ROWS - 1; row++){
-				if(result[row][col] != result[row + 1][col]){
+				if((result[row][col] > 0 && result[row + 1][col] == 0) 
+						|| (result[row][col] == 0 && result[row + 1][col] > 0)){
 					total += 1;
 				}
 			}
@@ -232,6 +233,7 @@ public class PlayerSkeleton {
 		PlayerSkeleton p = new PlayerSkeleton();
 		while(!s.hasLost()) {
 			s.makeMove(p.pickMove(s,s.legalMoves()));
+			System.out.println(s.getRowsCleared()+" rows.");
 			s.draw();
 			s.drawNext(0,0);
 			try {
