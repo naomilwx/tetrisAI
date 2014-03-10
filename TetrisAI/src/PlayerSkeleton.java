@@ -13,8 +13,11 @@ public class PlayerSkeleton {
 	private double rtWeight = -3.2178882868487753;
 	private double ctWeight = -9.348695305445199;
 	
-	private int landingHeight = 0;
-	private int[] top;
+//	private int landingHeight = 0;
+//	private int[] top;
+	private static int CLEARED_INDEX = 0;
+	private static int LANDING_INDEX = 1;
+	
 	//implement this function to have a working system
 	public void copy2DArray(int[][] arrayFrom, int[][]arrayTo){
 		for(int i = 0; i<arrayFrom.length; i++){
@@ -35,9 +38,12 @@ public class PlayerSkeleton {
 			int slot = legalMoves[i][State.SLOT];
 			int[][] gameTry = new int[State.ROWS][State.COLS];
 			copy2DArray(gameField, gameTry);
-			int rowsCleared = tryMove(gameTry, s, piece, orient, slot);
-			if(rowsCleared >= 0){
-				double eval = evaluateMove(gameTry, rowsCleared);
+			int[] top = s.getTop().clone();
+			int[] moveResult = tryMove(gameTry, top, s, piece, orient, slot);
+			if(moveResult != null){
+				int rowsCleared = moveResult[CLEARED_INDEX];
+				int landingHeight = moveResult[LANDING_INDEX];
+				double eval = evaluateMove(gameTry, rowsCleared, top, landingHeight);
 				if(eval > highest){
 					highest = eval;
 					bestMove = i;
@@ -46,16 +52,16 @@ public class PlayerSkeleton {
 		}
 		return bestMove;
 	}
-	double evaluateMove(int[][] result, int rowsCleared){
+	double evaluateMove(int[][] result, int rowsCleared, int[] top, int landingHeight){
 		double utility = clearedWeight * rowsCleared 
-				+ holeWeight * getNumberOfHoles(result)
+				+ holeWeight * getNumberOfHoles(result, top)
 				+ heightWeight * landingHeight
-				+ wellsWeight * getWells(result)
+				+ wellsWeight * getWells(result, top)
 				+ rtWeight * getNumRowTransitions(result)
 				+ ctWeight * getNumColTransitions(result);
 		return utility;
 	}
-	int getNumberOfHoles(int[][] result){
+	int getNumberOfHoles(int[][] result, int[] top){
 		int totalHoles = 0;
 		for(int col = 0; col < State.COLS; col++){
 			for(int row = 0; row < top[col] - 1; row++){
@@ -66,7 +72,7 @@ public class PlayerSkeleton {
 		}
 		return totalHoles;
 	}
-	int getMaximumHeight(){
+	int getMaximumHeight(int[] top){
 		int highest = 0;
 		for(int i = 0; i < top.length; i++){
 			if(top[i] > highest){
@@ -88,11 +94,11 @@ public class PlayerSkeleton {
 		return total;
 	}
 	
-	int cumulateWellDepth(int col, int[][] result){
+	int cumulateWellDepth(int col, int[][] result, int highest){
 		int total = 0;
 		int currDepth = 0;
 		int level = 0;
-		int highest = getMaximumHeight();
+//		int highest = getMaximumHeight(top);
 		for(int i = highest - 1; i >= 0; i--){
 			level += 1;
 			if(result[i][col] > 0){
@@ -121,12 +127,13 @@ public class PlayerSkeleton {
 			return result[height][col + 1] > 0 && result[height][col - 1] > 0;
 		}
 	}
-	int getWells(int[][] result){
+	int getWells(int[][] result, int[] top){
 		//Based on the interesting calculation in eltetris
 		//TODO:
 		int total = 0;
+		int highest = getMaximumHeight(top);
 		for(int col = 0; col < State.COLS; col ++){
-			total += cumulateWellDepth(col, result);
+			total += cumulateWellDepth(col, result, highest);
 		}
 //		System.out.println("wells "+ total);
 		return total;
@@ -164,10 +171,11 @@ public class PlayerSkeleton {
 		return total;
 	}
 	
-	private int tryMove(int[][] field, State s, int nextPiece, int orient, int slot){
-		//Returns the number of rows cleared. -1 means game over.
+	private int[] tryMove(int[][] field, int[] top, State s, int nextPiece, int orient, int slot){
+		//Returns array containing the number of rows cleared, the array top and landing height
+		//Returns null if game is lost
 		int rowsCleared = 0;
-		top = s.getTop().clone();
+//		top = s.getTop().clone();
 		int[][][] pBottom = State.getpBottom();
 		int[][][] pTop = State.getpTop();
 		int [][] pHeight = State.getpHeight();
@@ -180,9 +188,9 @@ public class PlayerSkeleton {
 		}
 		//check if game ended
 		int pieceHeight = pHeight[nextPiece][orient];
-		landingHeight = height + pieceHeight/2;
+		int landingHeight = height + pieceHeight/2;
 		if(height+pieceHeight >= State.ROWS) {
-			return -1;
+			return null;
 		}
 		
 		//for each column in the piece - fill in the appropriate blocks
@@ -224,7 +232,8 @@ public class PlayerSkeleton {
 						}
 					}
 				}
-		return rowsCleared;
+		int[] retArr = {rowsCleared, landingHeight};
+		return retArr;
 	}
 	
 	public static void main(String[] args) {
