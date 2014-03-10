@@ -243,14 +243,15 @@ public class PlayerSkeleton {
 		while(!s.hasLost()) {
 			s.makeMove(p.pickMove(s,s.legalMoves()));
 			System.out.println(s.getRowsCleared()+" rows.");
-			s.draw();
-			s.drawNext(0,0);
-			try {
-				Thread.sleep(300);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+//			s.draw();
+//			s.drawNext(0,0);
+//			try {
+//				Thread.sleep(300);
+//			} catch (InterruptedException e) {
+//				e.printStackTrace();
+//			}
 		}
+		s.draw();
 		System.out.println("You have completed "+s.getRowsCleared()+" rows.");
 	}
 	
