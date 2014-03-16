@@ -13,11 +13,22 @@ public class PlayerSkeleton {
 	private double rtWeight = -3.2178882868487753;
 	private double ctWeight = -9.348695305445199;
 	
+	public static final int NUM_OF_DIMENSIONS = 6;
 //	private int landingHeight = 0;
 //	private int[] top;
 	private static int CLEARED_INDEX = 0;
 	private static int LANDING_INDEX = 1;
 	
+	public PlayerSkeleton(){
+	}
+	public PlayerSkeleton(double position[]){
+		holeWeight = position[0];
+		heightWeight = position[1];
+		clearedWeight = position[2];
+		wellsWeight = position[3];
+		rtWeight = position[4];
+		ctWeight = position[5];
+	}
 	//implement this function to have a working system
 	public void copy2DArray(int[][] arrayFrom, int[][]arrayTo){
 		for(int i = 0; i<arrayFrom.length; i++){
@@ -239,7 +250,9 @@ public class PlayerSkeleton {
 	public static void main(String[] args) {
 		State s = new State();
 		new TFrame(s);
-		PlayerSkeleton p = new PlayerSkeleton();
+		double[] arr = {-15.0, -7.657493030930552, 15.0, -4.106062205383264, -3.522734028676709, -15.0};
+		PlayerSkeleton p = new PlayerSkeleton(arr);
+//		PlayerSkeleton p = new PlayerSkeleton(s);
 		while(!s.hasLost()) {
 			s.makeMove(p.pickMove(s,s.legalMoves()));
 			System.out.println(s.getRowsCleared()+" rows.");
