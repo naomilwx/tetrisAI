@@ -2,10 +2,29 @@ import jswarm.*;
 
 public class FitnessTrainer extends FitnessFunction{
 	private static final int NUM_OF_TRIALS = 5;
-	public double evaluate(double position[]) {
+	public double evaluate(final double position[]) {
 		double ret = 0;
+		Thread[] threads = new Thread[NUM_OF_TRIALS];
+		final double[] rets = new double[NUM_OF_TRIALS];
 		for(int i = 0; i < NUM_OF_TRIALS; i++){
-			ret+= train(position);
+			final int index = i;
+			Thread t = new Thread(){
+				@Override
+				public void run(){
+					rets[index]= train(position);
+				}
+			};
+			threads[i] = t;
+			t.start();
+		}
+		for(int i = 0; i < NUM_OF_TRIALS; i++){
+			try {
+				threads[i].join();
+				ret += rets[i];
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		ret = ret/NUM_OF_TRIALS;
 		System.out.println("lines: "+ ret);
