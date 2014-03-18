@@ -98,7 +98,26 @@ public class Swarm implements Iterable<Particle> {
 	//-------------------------------------------------------------------------
 	// Methods
 	//-------------------------------------------------------------------------
+	private void evaluateParticle(int i){
+		// Evaluate particle
+		double fit = fitnessFunction.evaluate(particles[i]);
+		synchronized(this){
+			numberOfEvaliations++; // Update counter
 
+			// Update 'best global' position
+			if (fitnessFunction.isBetterThan(bestFitness, fit)) {
+				bestFitness = fit; // Copy best fitness, index, and position vector
+				bestParticleIndex = i;
+				if (bestPosition == null) bestPosition = new double[sampleParticle.getDimension()];
+				particles[bestParticleIndex].copyPosition(bestPosition);
+			}
+
+			// Update 'best neighborhood' 
+			if (neighborhood != null) {
+				neighborhood.update(this, particles[i]);
+			}
+		}
+	}
 	/**
 	 * Evaluate fitness function for every particle 
 	 * Warning: particles[] must be initialized and fitnessFunction must be set
@@ -116,25 +135,25 @@ public class Swarm implements Iterable<Particle> {
 		//---
 		// Evaluate each particle (and find the 'best' one)
 		//---
+		Thread[] threads = new Thread[particles.length];
 		for (int i = 0; i < particles.length; i++) {
-			// Evaluate particle
-			double fit = fitnessFunction.evaluate(particles[i]);
-
-			numberOfEvaliations++; // Update counter
-
-			// Update 'best global' position
-			if (fitnessFunction.isBetterThan(bestFitness, fit)) {
-				bestFitness = fit; // Copy best fitness, index, and position vector
-				bestParticleIndex = i;
-				if (bestPosition == null) bestPosition = new double[sampleParticle.getDimension()];
-				particles[bestParticleIndex].copyPosition(bestPosition);
+			final int pos = i;
+			Thread t = new Thread(){
+				@Override
+				public void run(){
+					evaluateParticle(pos);
+				}
+			};
+			threads[i] = t;
+			t.start();
+		}
+		for(int i = 0; i < threads.length; i++){
+			try {
+				threads[i].join();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
-
-			// Update 'best neighborhood' 
-			if (neighborhood != null) {
-				neighborhood.update(this, particles[i]);
-			}
-
 		}
 	}
 

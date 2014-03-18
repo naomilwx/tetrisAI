@@ -252,7 +252,7 @@ public class PlayerSkeleton {
 		new TFrame(s);
 		double[] arr = {-15.0, -7.657493030930552, 15.0, -4.106062205383264, -3.522734028676709, -15.0};
 		PlayerSkeleton p = new PlayerSkeleton(arr);
-//		PlayerSkeleton p = new PlayerSkeleton(s);
+//		PlayerSkeleton p = new PlayerSkeleton();
 		while(!s.hasLost()) {
 			s.makeMove(p.pickMove(s,s.legalMoves()));
 			System.out.println(s.getRowsCleared()+" rows.");
