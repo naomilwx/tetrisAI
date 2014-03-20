@@ -38,7 +38,7 @@ public class Swarm implements Iterable<Particle> {
 	/** Minimum Velocity for each dimension. WARNING: Velocity is no in Abs value (so setting minVelocity to 0 is NOT correct!) */
 	double minVelocity[];
 	/** How many times 'particle.evaluate()' has been called? */
-	int numberOfEvaliations;
+	int numberOfEvaluations;
 	/** Number of particles in this swarm */
 	int numberOfParticles;
 	/** Particle's increment (for velocity update), usually called 'c1' constant */
@@ -77,7 +77,7 @@ public class Swarm implements Iterable<Particle> {
 		globalIncrement = DEFAULT_GLOBAL_INCREMENT;
 		inertia = DEFAULT_INERTIA;
 		particleIncrement = DEFAULT_PARTICLE_INCREMENT;
-		numberOfEvaliations = 0;
+		numberOfEvaluations = 0;
 		this.numberOfParticles = numberOfParticles;
 		this.sampleParticle = sampleParticle;
 		this.fitnessFunction = fitnessFunction;
@@ -102,7 +102,7 @@ public class Swarm implements Iterable<Particle> {
 		// Evaluate particle
 		double fit = fitnessFunction.evaluate(particles[i]);
 		synchronized(this){
-			numberOfEvaliations++; // Update counter
+			numberOfEvaluations++; // Update counter
 
 			// Update 'best global' position
 			if (fitnessFunction.isBetterThan(bestFitness, fit)) {
@@ -243,7 +243,7 @@ public class Swarm implements Iterable<Particle> {
 	}
 
 	public int getNumberOfEvaliations() {
-		return numberOfEvaliations;
+		return numberOfEvaluations;
 	}
 
 	public int getNumberOfParticles() {
@@ -411,7 +411,7 @@ public class Swarm implements Iterable<Particle> {
 	}
 
 	public void setNumberOfEvaliations(int numberOfEvaliations) {
-		this.numberOfEvaliations = numberOfEvaliations;
+		this.numberOfEvaluations = numberOfEvaliations;
 	}
 
 	public void setNumberOfParticles(int numberOfParticles) {
@@ -527,7 +527,7 @@ public class Swarm implements Iterable<Particle> {
 			stats += "Best fitness: " + bestFitness + "\nBest position: \t[";
 			for (int i = 0; i < bestPosition.length; i++)
 				stats += bestPosition[i] + (i < (bestPosition.length - 1) ? ", " : "");
-			stats += "]\nNumber of evaluations: " + numberOfEvaliations + "\n";
+			stats += "]\nNumber of evaluations: " + numberOfEvaluations + "\n";
 		}
 		return stats;
 	}

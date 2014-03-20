@@ -1,7 +1,7 @@
 import jswarm.*;
 
 public class FitnessTrainer extends FitnessFunction{
-	private static final int NUM_OF_TRIALS = 5;
+	private static final int NUM_OF_TRIALS = 1;
 	public double evaluate(final double position[]) {
 		double ret = 0;
 		for(int i = 0; i < NUM_OF_TRIALS; i++){

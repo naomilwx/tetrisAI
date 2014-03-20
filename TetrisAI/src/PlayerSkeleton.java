@@ -250,7 +250,8 @@ public class PlayerSkeleton {
 	public static void main(String[] args) {
 		State s = new State();
 		new TFrame(s);
-		double[] arr = {-15.0, -7.657493030930552, 15.0, -4.106062205383264, -3.522734028676709, -15.0};
+		double[] arr = {-5.888523175136358, -9.2251498112653, 7.989131664971451, -4.874844676215399, -0.5362194030430125, -11.606176029214824};
+//		double[] arr = {-15.0, -7.657493030930552, 15.0, -4.106062205383264, -3.522734028676709, -15.0};
 		PlayerSkeleton p = new PlayerSkeleton(arr);
 //		PlayerSkeleton p = new PlayerSkeleton();
 		while(!s.hasLost()) {
