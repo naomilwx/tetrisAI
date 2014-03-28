@@ -242,7 +242,7 @@ public class Swarm implements Iterable<Particle> {
 		return neighborhoodIncrement;
 	}
 
-	public int getNumberOfEvaliations() {
+	public int getNumberOfEvaluations() {
 		return numberOfEvaluations;
 	}
 
@@ -410,7 +410,7 @@ public class Swarm implements Iterable<Particle> {
 		this.neighborhoodIncrement = neighborhoodIncrement;
 	}
 
-	public void setNumberOfEvaliations(int numberOfEvaliations) {
+	public void setNumberOfEvaluations(int numberOfEvaliations) {
 		this.numberOfEvaluations = numberOfEvaliations;
 	}
 
