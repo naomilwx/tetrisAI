@@ -12,14 +12,22 @@ public class PlayerSkeleton {
 	private double wellsWeight = -3.3855972247263626;
 	private double rtWeight = -3.2178882868487753;
 	private double ctWeight = -9.348695305445199;
+	private double lookaheadFactor = 0.9;
+	int[] pieceHistory;
+	int totalPieces;
 	
 	public static final int NUM_OF_DIMENSIONS = 6;
 //	private int landingHeight = 0;
 //	private int[] top;
 	private static int CLEARED_INDEX = 0;
 	private static int LANDING_INDEX = 1;
+	private static int LOOKAHEAD_STEPS = 2;
+	private static int BEST_MOVE_INDEX = 1;
+	private static int BEST_MOVE_EVAL_INDEX = 0;
 	
 	public PlayerSkeleton(){
+		pieceHistory = new int[State.N_PIECES];
+		totalPieces = 0;
 	}
 	public PlayerSkeleton(double position[]){
 		holeWeight = position[0];
@@ -28,8 +36,9 @@ public class PlayerSkeleton {
 		wellsWeight = position[3];
 		rtWeight = position[4];
 		ctWeight = position[5];
+		pieceHistory = new int[State.N_PIECES];
 	}
-	//implement this function to have a working system
+
 	public void copy2DArray(int[][] arrayFrom, int[][]arrayTo){
 		for(int i = 0; i<arrayFrom.length; i++){
 			for(int j = 0; j < arrayFrom[i].length; j++){
@@ -37,33 +46,70 @@ public class PlayerSkeleton {
 			}
 		}
 	}
+	
+	public double lookAheadFeatureWeight(int piece){
+		return pieceHistory[piece]/totalPieces;
+	}
+	
 	public int pickMove(State s, int[][] legalMoves) {
 		//TODO:
 		int piece = s.getNextPiece();
+		pieceHistory[piece] += 1;
+		totalPieces += 1;
+		
+		int[][] gameField = s.getField();
+		int turn = s.getTurnNumber() + 1;
+//		int[] originalTop = s.getTop();
+
+		int bestMove = (int)evaluateMovesForPiece(gameField, s.getTop(), turn, piece, true)[BEST_MOVE_INDEX];
+		return bestMove;
+	}
+	
+	
+	public double[] evaluateMovesForPiece(int[][] field, int[] originalTop, int turn, int piece, boolean lookAhead){
+		int[][] legalMoves = State.legalMoves[piece];
 		double highest = Double.NEGATIVE_INFINITY;
 		int bestMove = 0;
-		int[][] gameField = s.getField();
-
-		for(int i = 0; i<legalMoves.length; i++){
-			int orient = legalMoves[i][State.ORIENT];
-			int slot = legalMoves[i][State.SLOT];
+		for(int move = 0; move < legalMoves.length; move++){
+			int orient = legalMoves[move][State.ORIENT];
+			int slot = legalMoves[move][State.SLOT];
 			int[][] gameTry = new int[State.ROWS][State.COLS];
-			copy2DArray(gameField, gameTry);
-			int[] top = s.getTop().clone();
-			int[] moveResult = tryMove(gameTry, top, s, piece, orient, slot);
+			copy2DArray(field, gameTry);
+			int [] top = originalTop.clone();
+			int[] moveResult = tryMove(gameTry, top, turn, piece, orient, slot);
+			turn  += 1;
 			if(moveResult != null){
 				int rowsCleared = moveResult[CLEARED_INDEX];
 				int landingHeight = moveResult[LANDING_INDEX];
-				double eval = evaluateMove(gameTry, rowsCleared, top, landingHeight);
+				double eval = evaluateMoveResult(gameTry, rowsCleared, top, landingHeight);
+				if(lookAhead){
+					for(int time = 1; time < LOOKAHEAD_STEPS; time ++){
+						eval += evaluateNextMove(gameTry, top, turn);
+						turn += 1;
+					}
+				}
 				if(eval > highest){
 					highest = eval;
-					bestMove = i;
+					bestMove = move;
 				}
 			}
 		}
-		return bestMove;
+		double[] moveResult = new double[2];
+		moveResult[BEST_MOVE_EVAL_INDEX] = highest;
+		moveResult[BEST_MOVE_INDEX] = bestMove;
+		return moveResult;
 	}
-	double evaluateMove(int[][] result, int rowsCleared, int[] top, int landingHeight){
+	
+	public double evaluateNextMove(int[][] field, int[] top, int turn){
+		double total = 0;
+		for(int i = 0; i < State.N_PIECES; i++){
+			total += evaluateMovesForPiece(field, top, turn, i, false)[BEST_MOVE_EVAL_INDEX]
+					* lookAheadFeatureWeight(i);
+		}
+		return total * lookaheadFactor;
+	}
+	
+	double evaluateMoveResult(int[][] result, int rowsCleared, int[] top, int landingHeight){
 		double utility = clearedWeight * rowsCleared 
 				+ holeWeight * getNumberOfHoles(result, top)
 				+ heightWeight * landingHeight
@@ -183,7 +229,7 @@ public class PlayerSkeleton {
 		return total;
 	}
 	
-	private int[] tryMove(int[][] field, int[] top, State s, int nextPiece, int orient, int slot){
+	private int[] tryMove(int[][] field, int[] top, int turn, int nextPiece, int orient, int slot){
 		//Returns array containing the number of rows cleared, the array top and landing height
 		//Returns null if game is lost
 		int rowsCleared = 0;
@@ -193,7 +239,7 @@ public class PlayerSkeleton {
 		int [][] pHeight = State.getpHeight();
 		int[][] pWidth = State.getpWidth();
 		int height = top[slot]-pBottom[nextPiece][orient][0];
-		int turn = s.getTurnNumber() + 1;
+		
 		//for each column beyond the first in the piece
 		for(int c = 1; c < pWidth[nextPiece][orient];c++) {
 			height = Math.max(height,top[slot+c]-pBottom[nextPiece][orient][c]);
@@ -252,9 +298,9 @@ public class PlayerSkeleton {
 		State s = new State();
 		new TFrame(s);
 //		double[] arr = {-5.003646727088223, -6.832461269940281, -3.750335096683833, -2.6719579714199857, -1.8484064582162885, -10.28934027117086};
-		double[] arr = {-15.0, -7.657493030930552, 15.0, -4.106062205383264, -3.522734028676709, -15.0};
-		PlayerSkeleton p = new PlayerSkeleton(arr);
-//		PlayerSkeleton p = new PlayerSkeleton();
+//		double[] arr = {-15.0, -7.657493030930552, 15.0, -4.106062205383264, -3.522734028676709, -15.0};
+//		PlayerSkeleton p = new PlayerSkeleton(arr);
+		PlayerSkeleton p = new PlayerSkeleton();
 		while(!s.hasLost()) {
 			s.makeMove(p.pickMove(s,s.legalMoves()));
 			System.out.println(s.getRowsCleared()+" rows.");
