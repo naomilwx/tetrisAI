@@ -51,7 +51,7 @@ public class PlayerSkeleton {
 		}
 	}
 	
-	public double lookAheadFeatureWeight(int piece){
+	public double lookAheadPieceWeight(int piece){
 		return (double)pieceHistory[piece]/totalPieces;
 	}
 	
@@ -106,8 +106,11 @@ public class PlayerSkeleton {
 		double total = 0;
 		for(int i = 0; i < State.N_PIECES; i++){
 			double[] bestMoveResult = evaluateMovesForPiece(field, top, turn, i, false);
-			total += bestMoveResult[BEST_MOVE_EVAL_INDEX]
-					* lookAheadFeatureWeight(i);
+			double pieceWeight = lookAheadPieceWeight(i);
+			if(pieceWeight > 0){
+				total += bestMoveResult[BEST_MOVE_EVAL_INDEX]
+					* pieceWeight;
+			}
 			//At this point field is NOT mutated
 		}
 		return total * lookaheadFactor;
