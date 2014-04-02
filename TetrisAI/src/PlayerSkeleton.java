@@ -52,15 +52,12 @@ public class PlayerSkeleton {
 	}
 	
 	public int pickMove(State s, int[][] legalMoves) {
-		//TODO:
 		int piece = s.getNextPiece();
 		pieceHistory[piece] += 1;
 		totalPieces += 1;
 		
 		int[][] gameField = s.getField();
 		int turn = s.getTurnNumber() + 1;
-//		int[] originalTop = s.getTop();
-
 		int bestMove = (int)evaluateMovesForPiece(gameField, s.getTop(), turn, piece, true)[BEST_MOVE_INDEX];
 		return bestMove;
 	}
@@ -193,7 +190,6 @@ public class PlayerSkeleton {
 		for(int col = 0; col < State.COLS; col ++){
 			total += cumulateWellDepth(col, result, highest);
 		}
-//		System.out.println("wells "+ total);
 		return total;
 	}
 	
@@ -233,7 +229,6 @@ public class PlayerSkeleton {
 		//Returns array containing the number of rows cleared, the array top and landing height
 		//Returns null if game is lost
 		int rowsCleared = 0;
-//		top = s.getTop().clone();
 		int[][][] pBottom = State.getpBottom();
 		int[][][] pTop = State.getpTop();
 		int [][] pHeight = State.getpHeight();
