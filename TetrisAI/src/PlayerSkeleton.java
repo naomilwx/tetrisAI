@@ -16,12 +16,12 @@ public class PlayerSkeleton {
 	int[] pieceHistory;
 	int totalPieces;
 	
+	private static boolean LOOKAHEAD = true;
 	public static final int NUM_OF_DIMENSIONS = 6;
 //	private int landingHeight = 0;
 //	private int[] top;
 	private static int CLEARED_INDEX = 0;
 	private static int LANDING_INDEX = 1;
-	private static int LOOKAHEAD_STEPS = 2;
 	private static int BEST_MOVE_INDEX = 1;
 	private static int BEST_MOVE_EVAL_INDEX = 0;
 	
@@ -37,6 +37,10 @@ public class PlayerSkeleton {
 		rtWeight = position[4];
 		ctWeight = position[5];
 		pieceHistory = new int[State.N_PIECES];
+		totalPieces = 0;
+		if(position.length == 7){
+			lookaheadFactor = position[6];
+		}
 	}
 
 	public void copy2DArray(int[][] arrayFrom, int[][]arrayTo){
@@ -48,7 +52,7 @@ public class PlayerSkeleton {
 	}
 	
 	public double lookAheadFeatureWeight(int piece){
-		return pieceHistory[piece]/totalPieces;
+		return (double)pieceHistory[piece]/totalPieces;
 	}
 	
 	public int pickMove(State s, int[][] legalMoves) {
@@ -58,12 +62,15 @@ public class PlayerSkeleton {
 		
 		int[][] gameField = s.getField();
 		int turn = s.getTurnNumber() + 1;
-		int bestMove = (int)evaluateMovesForPiece(gameField, s.getTop(), turn, piece, true)[BEST_MOVE_INDEX];
+		double[] evaluatedMove = evaluateMovesForPiece(gameField, s.getTop(), turn, piece, LOOKAHEAD);
+		int bestMove = (int)evaluatedMove[BEST_MOVE_INDEX];
 		return bestMove;
 	}
 	
 	
 	public double[] evaluateMovesForPiece(int[][] field, int[] originalTop, int turn, int piece, boolean lookAhead){
+		//field and originalTop is cloned in this function. 
+		//so the state of the gameboard is not modified by this function
 		int[][] legalMoves = State.legalMoves[piece];
 		double highest = Double.NEGATIVE_INFINITY;
 		int bestMove = 0;
@@ -73,17 +80,15 @@ public class PlayerSkeleton {
 			int[][] gameTry = new int[State.ROWS][State.COLS];
 			copy2DArray(field, gameTry);
 			int [] top = originalTop.clone();
-			int[] moveResult = tryMove(gameTry, top, turn, piece, orient, slot);
+			int[] moveResult = tryMove(gameTry, top, turn, piece, orient, slot);//at this point gameTry has been mutated to the state after the first move
 			turn  += 1;
 			if(moveResult != null){
 				int rowsCleared = moveResult[CLEARED_INDEX];
 				int landingHeight = moveResult[LANDING_INDEX];
 				double eval = evaluateMoveResult(gameTry, rowsCleared, top, landingHeight);
 				if(lookAhead){
-					for(int time = 1; time < LOOKAHEAD_STEPS; time ++){
-						eval += evaluateNextMove(gameTry, top, turn);
-						turn += 1;
-					}
+					eval += evaluateNextMove(gameTry, top, turn);
+					turn += 1;
 				}
 				if(eval > highest){
 					highest = eval;
@@ -100,8 +105,10 @@ public class PlayerSkeleton {
 	public double evaluateNextMove(int[][] field, int[] top, int turn){
 		double total = 0;
 		for(int i = 0; i < State.N_PIECES; i++){
-			total += evaluateMovesForPiece(field, top, turn, i, false)[BEST_MOVE_EVAL_INDEX]
+			double[] bestMoveResult = evaluateMovesForPiece(field, top, turn, i, false);
+			total += bestMoveResult[BEST_MOVE_EVAL_INDEX]
 					* lookAheadFeatureWeight(i);
+			//At this point field is NOT mutated
 		}
 		return total * lookaheadFactor;
 	}
@@ -184,7 +191,6 @@ public class PlayerSkeleton {
 	}
 	int getWells(int[][] result, int[] top){
 		//Based on the interesting calculation in eltetris
-		//TODO:
 		int total = 0;
 		int highest = getMaximumHeight(top);
 		for(int col = 0; col < State.COLS; col ++){
@@ -226,6 +232,7 @@ public class PlayerSkeleton {
 	}
 	
 	private int[] tryMove(int[][] field, int[] top, int turn, int nextPiece, int orient, int slot){
+		//NOTE: TryMove mutates field and top!
 		//Returns array containing the number of rows cleared, the array top and landing height
 		//Returns null if game is lost
 		int rowsCleared = 0;
