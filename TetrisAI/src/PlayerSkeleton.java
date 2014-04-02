@@ -18,8 +18,7 @@ public class PlayerSkeleton {
 	
 	private static boolean LOOKAHEAD = true;
 	public static final int NUM_OF_DIMENSIONS = 6;
-//	private int landingHeight = 0;
-//	private int[] top;
+
 	private static int CLEARED_INDEX = 0;
 	private static int LANDING_INDEX = 1;
 	private static int BEST_MOVE_INDEX = 1;
@@ -155,7 +154,6 @@ public class PlayerSkeleton {
 				total += 1;
 			}
 		}
-//		System.out.println("col "+col + " depth "+ total);
 		return total;
 	}
 	
@@ -163,7 +161,6 @@ public class PlayerSkeleton {
 		int total = 0;
 		int currDepth = 0;
 		int level = 0;
-//		int highest = getMaximumHeight(top);
 		for(int i = highest - 1; i >= 0; i--){
 			level += 1;
 			if(result[i][col] > 0){
