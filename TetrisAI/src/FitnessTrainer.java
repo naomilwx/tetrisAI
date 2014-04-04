@@ -30,8 +30,8 @@ public class FitnessTrainer extends FitnessFunction{
 
 		// Set position (and velocity) constraints. I.e.: where to look for solutions
 		swarm.setInertia(1);
-		swarm.setMaxPosition(15);
-		swarm.setMinPosition(-16);
+		swarm.setMaxPosition(3);
+		swarm.setMinPosition(-5);
 		swarm.setMaxMinVelocity(0.1);
 //		double initial[] = {-7.899265427351652, -4.500158825082766, 
 //				3.4181268101392694, -3.3855972247263626,-3.2178882868487753,-9.348695305445199};
