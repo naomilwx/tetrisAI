@@ -29,6 +29,9 @@ public class PlayerSkeleton {
 		totalPieces = 0;
 	}
 	public PlayerSkeleton(double position[]){
+		/*
+		 * Initialise with array of weights. Use this to train player
+		 * */
 		holeWeight = position[0];
 		heightWeight = position[1];
 		clearedWeight = position[2];
@@ -43,6 +46,9 @@ public class PlayerSkeleton {
 	}
 
 	public void copy2DArray(int[][] arrayFrom, int[][]arrayTo){
+		/*
+		 * Does a deep copy of a 2D array
+		 * */
 		for(int i = 0; i<arrayFrom.length; i++){
 			for(int j = 0; j < arrayFrom[i].length; j++){
 				arrayTo[i][j] = arrayFrom[i][j];
@@ -70,6 +76,14 @@ public class PlayerSkeleton {
 	public double[] evaluateMovesForPiece(int[][] field, int[] originalTop, int turn, int piece, boolean lookAhead){
 		//field and originalTop is cloned in this function. 
 		//so the state of the gameboard is not modified by this function
+		/*
+		 * Evaluates the best possible move, based on the utility for the given piece
+		 * @param field: 2D array representing the gamestate
+		 * @param originalTop: 1D array representing the top (height of each row)
+		 * @param turn: number of turns made before current move
+		 * @param piece: the piece to move
+		 * @param looakahead: boolean flag to indicate whether to look 1 step ahead for the evaluation
+		 * */
 		int[][] legalMoves = State.legalMoves[piece];
 		double highest = Double.NEGATIVE_INFINITY;
 		int bestMove = 0;
@@ -102,6 +116,12 @@ public class PlayerSkeleton {
 	}
 	
 	public double evaluateNextMove(int[][] field, int[] top, int turn){
+		//returns the utility of the best possible next move (lookahead)
+		/*
+		 * @param field: gamestate
+		 * @param top: height of each colum
+		 * @param turn: number of turns befor move
+		 * */
 		double total = 0;
 		for(int i = 0; i < State.N_PIECES; i++){
 			double[] bestMoveResult = evaluateMovesForPiece(field, top, turn, i, false);
@@ -116,6 +136,11 @@ public class PlayerSkeleton {
 	}
 	
 	double evaluateMoveResult(int[][] result, int rowsCleared, int[] top, int landingHeight){
+		/*
+		 * Returns the utility value of the current game state
+		 * @param result: gamestate
+		 * 
+		 * */
 		double utility = clearedWeight * rowsCleared 
 				+ holeWeight * getNumberOfHoles(result, top)
 				+ heightWeight * landingHeight
@@ -126,6 +151,9 @@ public class PlayerSkeleton {
 	}
 	
 	int getNumberOfHoles(int[][] result, int[] top){
+		/*
+		 * Feature: Returns the number of holes in the game board
+		 * */
 		int totalHoles = 0;
 		for(int col = 0; col < State.COLS; col++){
 			for(int row = 0; row < top[col] - 1; row++){
@@ -137,6 +165,9 @@ public class PlayerSkeleton {
 		return totalHoles;
 	}
 	int getMaximumHeight(int[] top){
+		/*
+		 * Feature: Returns the maximum column height of the game board
+		 * */
 		int highest = 0;
 		for(int i = 0; i < top.length; i++){
 			if(top[i] > highest){
@@ -145,6 +176,7 @@ public class PlayerSkeleton {
 		}
 		return highest;
 	}
+	
 	int getTopWellDepth(int col, int topRow, int[][] result){
 		int total = 0;
 		for(int i = topRow; i >= 0; i--){
@@ -190,6 +222,9 @@ public class PlayerSkeleton {
 		}
 	}
 	int getWells(int[][] result, int[] top){
+		/*
+		 * Feature: "Well depth". With heavy penalty for deeper wells
+		 * */
 		//Based on the interesting calculation in eltetris
 		int total = 0;
 		int highest = getMaximumHeight(top);
@@ -200,6 +235,9 @@ public class PlayerSkeleton {
 	}
 	
 	int getNumRowTransitions(int[][] result){
+		/*
+		 * Feature: # of row transitions
+		 * */
 		int total = 0;
 		for(int row = 0; row < State.ROWS; row++){
 			if(result[row][0] > 0){
@@ -216,6 +254,9 @@ public class PlayerSkeleton {
 	}
 	
 	int getNumColTransitions(int[][] result){
+		/*
+		 * Feature: # of column transitions
+		 * */
 		int total = 0;
 		for(int col = 0; col < State.COLS; col++){
 			if(result[0][col] > 0){
