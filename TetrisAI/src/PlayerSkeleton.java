@@ -16,7 +16,7 @@ public class PlayerSkeleton {
 	int[] pieceHistory;
 	int totalPieces;
 	
-	private static boolean LOOKAHEAD = true;
+	private static boolean LOOKAHEAD = true; //Set this to false to turn off lookahead
 	public static final int NUM_OF_DIMENSIONS = 6;
 
 	private static int CLEARED_INDEX = 0;
