@@ -41,14 +41,14 @@ public class Statistics
             return sum/data.size();
     }
     private void getMinAndMax(){
-        max = Integer.MAX_INT;
+        max = (int)Integer.MAX_VALUE;
         min = -1;
         for(double a :data){
             if (a > max){
-                max = a;
+                max = (int)a;
             }
             if (a < min){
-                min = a;
+                min = (int)a;
             }
         }
     }
@@ -89,13 +89,14 @@ public class Statistics
         		State s = new State();
         		//new TFrame(s);
                 double[] arr = {-15.102872968497385, -10.076600744230337, -5.261013306028994, -4.185635183663881, -2.265404828758591, -11.48290294875335};
-
+                PlayerSkeleton p = new PlayerSkeleton(arr);
                 while(!s.hasLost()) {
                     s.makeMove(p.pickMove(s,s.legalMoves()));
                 }
     			int var = s.getRowsCleared();
                 
     			stats.addResult(var);
+    			
     		}
     		stats.output();
     }
