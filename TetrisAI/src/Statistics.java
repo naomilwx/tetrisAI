@@ -40,7 +40,7 @@ public class Statistics
             sum += a;
             return sum/data.size();
     }
-    private void getMinAndMax{
+    private void getMinAndMax(){
         max = Integer.MAX_INT;
         min = -1;
         for(double a :data){
