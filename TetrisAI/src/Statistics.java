@@ -88,7 +88,7 @@ public class Statistics
     		for(int i = 0; i < 1000; i++) { // play a game with a certain parameter for 1000times
         		State s = new State();
         		//new TFrame(s);
-                double[] arr = {-15.102872968497385, -10.076600744230337, -5.261013306028994, -4.185635183663881, -2.265404828758591, -11.48290294875335};
+                double[] arr = {-15.102872968497385, -6.01796988891534, -4.826617711953205, -4.185635183663881, -3.6184477329302336, -10.49441256846234};
                 PlayerSkeleton p = new PlayerSkeleton(arr);
                 while(!s.hasLost()) {
                     s.makeMove(p.pickMove(s,s.legalMoves()));

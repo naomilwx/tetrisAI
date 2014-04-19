@@ -16,7 +16,7 @@ public class PlayerSkeleton {
 	int[] pieceHistory;
 	int totalPieces;
 	
-	private static boolean LOOKAHEAD = true; //Set this to false to turn off lookahead
+	private static boolean LOOKAHEAD = false; //Set this to false to turn off lookahead
 	public static final int NUM_OF_DIMENSIONS = 6;
 
 	private static int CLEARED_INDEX = 0;
@@ -240,7 +240,10 @@ public class PlayerSkeleton {
 		 * */
 		int total = 0;
 		for(int row = 0; row < State.ROWS; row++){
-			if(result[row][0] > 0){
+			if(result[row][0] == 0){
+				total += 1;
+			}
+			if(result[row][State.COLS - 1] == 0){
 				total += 1;
 			}
 			for(int col = 1; col < State.COLS - 1; col++){
@@ -259,7 +262,7 @@ public class PlayerSkeleton {
 		 * */
 		int total = 0;
 		for(int col = 0; col < State.COLS; col++){
-			if(result[0][col] > 0){
+			if(result[0][col] == 0){
 				total += 1;
 			}
 			for(int row = 1; row < State.ROWS - 1; row++){
@@ -342,6 +345,7 @@ public class PlayerSkeleton {
 		new TFrame(s);
 //		double[] arr = {-5.003646727088223, -6.832461269940281, -3.750335096683833, -2.6719579714199857, -1.8484064582162885, -10.28934027117086};
 //		double[] arr = {-15.0, -7.657493030930552, 15.0, -4.106062205383264, -3.522734028676709, -15.0};
+//		double[] arr = {-15.102872968497385, -10.076600744230337, -5.261013306028994, -4.185635183663881, -2.265404828758591, -11.48290294875335};
 //		PlayerSkeleton p = new PlayerSkeleton(arr);
 		PlayerSkeleton p = new PlayerSkeleton();
 		while(!s.hasLost()) {
