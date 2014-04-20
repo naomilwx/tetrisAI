@@ -25,6 +25,7 @@ public class Statistics
     }
     
     public void output() throws IOException {
+    	getMinAndMax();
 		System.out.print("Statistic of " + game +" for " + count + " runs;\n");
 		System.out.print("Mean: " + getMean() +"\n");
         System.out.println("Max: " + max);
